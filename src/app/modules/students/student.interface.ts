@@ -1,5 +1,3 @@
-import { Schema, model, connect } from 'mongoose';
-
 // Create an interface for student
 export type UserName = {
   firstName: string;
