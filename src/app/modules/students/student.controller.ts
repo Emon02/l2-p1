@@ -1,65 +1,30 @@
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
-import Joi from 'joi';
+import studentValidationSchema from './student.validation';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
-    // creating a schema validation using Joi
-    const JoiValidationSchema = Joi.object({
-      firstName: Joi.string()
-        .required()
-        .trim()
-        .max(20)
-        .pattern(/^[A-Z][a-z]*$/, { name: 'capitalize' })
-        .message(
-          '{#label} must start with an uppercase letter and only contain alphabetical characters',
-        ),
-      middleName: Joi.string().trim().max(20),
-      lastName: Joi.string()
-        .required()
-        .trim()
-        .max(20)
-        .pattern(/^[A-Z][a-z]*$/, { name: 'alphabetical' })
-        .message('{#label} must only contain alphabetical characters'),
-    });
-
-    const guardianSchema = Joi.object({
-      fatherName: Joi.string().required().trim(),
-      fatherOccupation: Joi.string().required().trim(),
-      fatherContactNo: Joi.string().required().trim(),
-      motherName: Joi.string().required().trim(),
-      motherOccupation: Joi.string().required().trim(),
-      motherContactNo: Joi.string().required().trim(),
-    });
-
-    const localGuardianSchema = Joi.object({
-      name: Joi.string().required().trim(),
-      occupation: Joi.string().required().trim(),
-      contactNo: Joi.string().required().trim(),
-      address: Joi.string().required().trim(),
-    });
-
-    const studentSchema = Joi.object({
-      id: Joi.string().required().trim(),
-      name: userNameSchema.required(),
-      gender: Joi.string().valid('male', 'female', 'other').required(),
-      email: Joi.string().email().required().trim(),
-      dateOfBirth: Joi.string().trim(),
-      contactNo: Joi.string().required().trim(),
-      emergencyContactNo: Joi.string().required().trim(),
-      bloodGroup: Joi.string()
-        .valid('A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-')
-        .trim(),
-      presentAddress: Joi.string().required().trim(),
-      guardian: guardianSchema.required(),
-      localGuardian: localGuardianSchema.required(),
-      profileImg: Joi.string().trim(),
-      isActive: Joi.string().valid('active', 'blocked').default('active'),
-    });
-
     const { student: studentData } = req.body;
+
+    // data validation using zod
+
+    const zodParseData = studentValidationSchema.parse(studentData);
+
+    // data validation using Joi
+    // const { error, value } = studentValidationSchema.validate(studentData);
+    // console.log({ error }, { value });
+
     // will call service function to load data
-    const result = await StudentServices.createStudentIntoDB(studentData);
+    const result = await StudentServices.createStudentIntoDB(zodParseData);
+
+    // if (error) {
+    //   res.status(500).json({
+    //     success: false,
+    //     message: 'Something went wrong',
+    //     data: error.details,
+    //   });
+    // }
+
     // send response
     res.status(200).json({
       success: true,
