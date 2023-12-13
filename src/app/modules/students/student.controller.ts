@@ -16,6 +16,7 @@ const createStudent = async (req: Request, res: Response) => {
 
     // will call service function to load data
     const result = await StudentServices.createStudentIntoDB(zodParseData);
+    // const result = await StudentServices.createStudentIntoDB(studentData);
 
     // if (error) {
     //   res.status(500).json({
@@ -31,11 +32,11 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'Student is created successfully.',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Something went wrong',
-      data: error,
+      message: error.message || 'Something went wrong',
+      error: error,
     });
   }
 };
@@ -48,11 +49,11 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: 'Student are retrieved successfully.',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Something went wrong',
-      data: error,
+      message: error.message || 'Something went wrong',
+      error: error,
     });
   }
 };
@@ -66,11 +67,30 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: 'Student is retrieved successfully.',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Something went wrong',
-      data: error,
+      message: error.message || 'Something went wrong',
+      error: error,
+    });
+  }
+};
+
+
+const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const result = await StudentServices.deleteStudentFromDB(studentId);
+    res.status(200).json({
+      success: true,
+      message: 'Student is deleted successfully.',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Something went wrong',
+      error: error,
     });
   }
 };
@@ -79,4 +99,5 @@ export const StudentControllers = {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  deleteStudent
 };
